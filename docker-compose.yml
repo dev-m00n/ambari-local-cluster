@@ -1,0 +1,124 @@
+version: "3.8"
+services:
+  cluster-db:
+    build:
+      context: "./cluster-db"
+      args:
+        POSTGRES_GID: ${POSTGRES_GID}
+        POSTGRES_UID: ${POSTGRES_UID}
+    image: "ambari-postgres"
+    container_name: "cluster-db"
+    environment:
+      POSTGRES_PASSWORD: "hadoop_postgres"
+      POSTGRES_USER: "hadoop_postgres"
+      PGDATA: "/pg_data"
+    volumes:
+      - ./cluster-db/docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d/
+      - ./cluster-db/mount/pg_data/:/pg_data/
+    ports:
+      - "5432:5432"
+    networks:
+      cluster-network:
+        ipv4_address: 10.5.0.2
+        aliases:
+          - db.cluster.local
+
+  ambari-server:
+    container_name: "ambari-server"
+    image: devmoonduck/ambari-local-server:2.7.4.0
+    tty: true
+    stdin_open: true
+    depends_on:
+      - "cluster-db"
+    ports:
+      - "8080:8080"
+      - "8440:9440"
+      - "8441:8441"
+    volumes:
+      - ./ambari-server/mount/scripts/entry.sh:/scripts/entry.sh
+      - ./ambari-server/mount/var/log/:/var/log/
+      - ./ambari-server/mount/etc/ambari-server/conf/:/etc/ambari-server/conf/
+    entrypoint:
+      - /scripts/entry.sh
+    hostname: "ambari-server"
+    privileged: true
+    networks:
+      cluster-network:
+        ipv4_address: 10.5.0.3
+        aliases:
+          - "ambari.server.local"
+
+  hadoop-worker1:
+    image: devmoonduck/ambari-local-agent:2.7.4.0
+    container_name: "hadoop-worker1"
+    tty: true
+    stdin_open: true
+    depends_on:
+      - "ambari-server"
+    ports:
+      - "22:22"
+    volumes:
+      - ./ambari-agent/hadoop-worker1/mount/var/log/:/var/log/
+      - ./ambari-agent/hadoop-worker1/mount/scripts/:/scripts/
+    entrypoint:
+      - /scripts/entry.sh
+    hostname: "hadoop-worker1"
+    privileged: true
+    networks:
+      cluster-network:
+        ipv4_address: 10.5.0.11
+        aliases:
+          - hadoop.worker1.local
+
+  hadoop-worker2:
+    image: devmoonduck/ambari-local-agent:2.7.4.0
+    container_name: "hadoop-worker2"
+    tty: true
+    stdin_open: true
+    depends_on:
+      - "ambari-server"
+    ports:
+      - "22:22"
+    volumes:
+      - ./ambari-agent/hadoop-worker2/mount/var/log/:/var/log/
+      - ./ambari-agent/hadoop-worker2/mount/scripts/:/scripts/
+    entrypoint:
+      - /scripts/entry.sh
+    hostname: "hadoop-worker2"
+    privileged: true
+    networks:
+      cluster-network:
+        ipv4_address: 10.5.0.12
+        aliases:
+          - hadoop.worker2.local
+
+  hadoop-worker3:
+    image: devmoonduck/ambari-local-agent:2.7.4.0
+    container_name: "hadoop-worker3"
+    tty: true
+    stdin_open: true
+    depends_on:
+      - "ambari-server"
+    ports:
+      - "22:22"
+    volumes:
+      - ./ambari-agent/hadoop-worker3/mount/var/log/:/var/log/
+      - ./ambari-agent/hadoop-worker3/mount/scripts/:/scripts/
+    entrypoint:
+      - /scripts/entry.sh
+    hostname: "hadoop-worker3"
+    privileged: true
+    networks:
+      cluster-network:
+        ipv4_address: 10.5.0.13
+        aliases:
+          - hadoop.worker3.local
+
+networks:
+  cluster-network:
+    driver: bridge
+    name: "cluster-network"
+    ipam:
+     config:
+       - subnet: 10.5.0.0/16
+         gateway: 10.5.0.1

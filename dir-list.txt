@@ -1,1 +1,0 @@
-cluster-db/mount/var/lib/postgresql/data

@@ -1,0 +1,6 @@
+cluster-db/mount/pg_data
+ambari-server/mount/scripts
+ambari-server/mount/var/log
+ambari-server/mount/etc/ambari-server/conf
+ambari-agent/hadoop-worker1/mount/var/log
+ambari-agent/hadoop-worker1/mount/scripts

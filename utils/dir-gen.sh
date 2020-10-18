@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DIR_LIST_FILE=./dir-list.txt
+DIR_LIST_FILE=$(pwd)/dir-list.txt
 HERE=`pwd`
 while read dir; do
   echo "Make dir: $HERE/$dir"
