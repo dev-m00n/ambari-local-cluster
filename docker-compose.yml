@@ -6,7 +6,7 @@ services:
       args:
         POSTGRES_GID: ${POSTGRES_GID}
         POSTGRES_UID: ${POSTGRES_UID}
-    image: "ambari-postgres"
+    image: "cluster-postgres"
     container_name: "cluster-db"
     environment:
       POSTGRES_PASSWORD: "hadoop_postgres"
@@ -28,6 +28,9 @@ services:
     image: devmoonduck/ambari-local-server:2.7.4.0
     tty: true
     stdin_open: true
+    environment:
+      AMBARI_USER_NAME: "${AMBARI_USER_NAME}"
+      AMBARI_UID: "${AMBARI_UID}"
     depends_on:
       - "cluster-db"
     ports:
@@ -35,11 +38,7 @@ services:
       - "8440:9440"
       - "8441:8441"
     volumes:
-      - ./ambari-server/mount/scripts/entry.sh:/scripts/entry.sh
       - ./ambari-server/mount/var/log/:/var/log/
-      - ./ambari-server/mount/etc/ambari-server/conf/:/etc/ambari-server/conf/
-    entrypoint:
-      - /scripts/entry.sh
     hostname: "ambari-server"
     privileged: true
     networks:
@@ -48,71 +47,164 @@ services:
         aliases:
           - "ambari.server.local"
 
-  hadoop-worker1:
+  namenode-1:
     image: devmoonduck/ambari-local-agent:2.7.4.0
-    container_name: "hadoop-worker1"
+    container_name: "hadoop-name1"
     tty: true
     stdin_open: true
+    environment:
+      AMBARI_USER_NAME: "${AMBARI_USER_NAME}"
+      AMBARI_UID: "${AMBARI_UID}"
     depends_on:
       - "ambari-server"
     ports:
-      - "22:22"
+      - "50070:50070"
+      - "50470:50470"
+      - "8020:8020"
+      - "9000:9000"
+      - "50090:50090"
     volumes:
-      - ./ambari-agent/hadoop-worker1/mount/var/log/:/var/log/
-      - ./ambari-agent/hadoop-worker1/mount/scripts/:/scripts/
-    entrypoint:
-      - /scripts/entry.sh
-    hostname: "hadoop-worker1"
+      - ./ambari-agent/hadoop-name1/mount/var/log/:/var/log/
+      - ./ambari-agent/hadoop-name1/mount/hadoop/:/hadoop/
+    hostname: "hadoop-name1"
     privileged: true
     networks:
       cluster-network:
         ipv4_address: 10.5.0.11
         aliases:
-          - hadoop.worker1.local
-
-  hadoop-worker2:
+          - hadoop.name1.local
+  datanode1:
     image: devmoonduck/ambari-local-agent:2.7.4.0
-    container_name: "hadoop-worker2"
+    container_name: "hadoop-data1"
     tty: true
     stdin_open: true
+    environment:
+      AMBARI_USER_NAME: "${AMBARI_USER_NAME}"
+      AMBARI_UID: "${AMBARI_UID}"
     depends_on:
       - "ambari-server"
-    ports:
-      - "22:22"
     volumes:
-      - ./ambari-agent/hadoop-worker2/mount/var/log/:/var/log/
-      - ./ambari-agent/hadoop-worker2/mount/scripts/:/scripts/
-    entrypoint:
-      - /scripts/entry.sh
-    hostname: "hadoop-worker2"
+      - ./ambari-agent/hadoop-data1/mount/var/log/:/var/log/
+      - ./ambari-agent/hadoop-data1/mount/hadoop/:/hadoop/
+    hostname: "hadoop-data1"
     privileged: true
     networks:
       cluster-network:
-        ipv4_address: 10.5.0.12
+        ipv4_address: 10.5.0.21
         aliases:
-          - hadoop.worker2.local
+          - hadoop.data1.local
 
-  hadoop-worker3:
+  datanode2:
     image: devmoonduck/ambari-local-agent:2.7.4.0
-    container_name: "hadoop-worker3"
+    container_name: "hadoop-data2"
     tty: true
     stdin_open: true
+    environment:
+      AMBARI_USER_NAME: "${AMBARI_USER_NAME}"
+      AMBARI_UID: "${AMBARI_UID}"
     depends_on:
       - "ambari-server"
-    ports:
-      - "22:22"
     volumes:
-      - ./ambari-agent/hadoop-worker3/mount/var/log/:/var/log/
-      - ./ambari-agent/hadoop-worker3/mount/scripts/:/scripts/
-    entrypoint:
-      - /scripts/entry.sh
-    hostname: "hadoop-worker3"
+      - ./ambari-agent/hadoop-data2/mount/var/log/:/var/log/
+      - ./ambari-agent/hadoop-data2/mount/hadoop/:/hadoop/
+    hostname: "hadoop-data2"
     privileged: true
     networks:
       cluster-network:
-        ipv4_address: 10.5.0.13
+        ipv4_address: 10.5.0.22
         aliases:
-          - hadoop.worker3.local
+          - hadoop.data2.local
+
+  hive-server:
+    image: devmoonduck/ambari-local-agent:2.7.4.0
+    container_name: "hive-server"
+    tty: true
+    stdin_open: true
+    environment:
+      AMBARI_USER_NAME: "${AMBARI_USER_NAME}"
+      AMBARI_UID: "${AMBARI_UID}"
+    depends_on:
+      - "ambari-server"
+    ports:
+      - "10000:10000"
+      - "9083:9083"
+      - "10001:10001"
+    volumes:
+      - ./ambari-agent/hive-server/mount/var/log/:/var/log/
+      - ./ambari-agent/hive-server/mount/hadoop/:/hadoop/
+    hostname: "hive-server"
+    privileged: true
+    networks:
+      cluster-network:
+        ipv4_address: 10.5.0.31
+        aliases:
+          - hive.server.local
+
+  kafka-broker:
+    image: devmoonduck/ambari-local-agent:2.7.4.0
+    container_name: "kafka-broker"
+    tty: true
+    stdin_open: true
+    environment:
+      AMBARI_USER_NAME: "${AMBARI_USER_NAME}"
+      AMBARI_UID: "${AMBARI_UID}"
+    depends_on:
+      - "ambari-server"
+    ports:
+      - "9092:9092"
+    volumes:
+      - ./ambari-agent/kafka-broker/mount/var/log/:/var/log/
+      - ./ambari-agent/kafka-broker/mount/hadoop/:/hadoop/
+      - ./ambari-agent/kafka-broker/mount/kafka-logs/:/kafka-logs/
+    hostname: "kafka-broker"
+    privileged: true
+    networks:
+      cluster-network:
+        ipv4_address: 10.5.0.41
+        aliases:
+          - kafka.broker1.local
+
+  knox:
+    image: devmoonduck/ambari-local-agent:2.7.4.0
+    container_name: "knox"
+    tty: true
+    stdin_open: true
+    environment:
+      AMBARI_USER_NAME: "${AMBARI_USER_NAME}"
+      AMBARI_UID: "${AMBARI_UID}"
+    depends_on:
+      - "ambari-server"
+    volumes:
+      - ./ambari-agent/knox/mount/var/log/:/var/log/
+      - ./ambari-agent/knox/mount/hadoop/:/hadoop/
+    hostname: "knox"
+    privileged: true
+    networks:
+      cluster-network:
+        ipv4_address: 10.5.0.51
+        aliases:
+          - knox.local
+
+  yarn-rm:
+    image: devmoonduck/ambari-local-agent:2.7.4.0
+    container_name: "yarn-rm"
+    tty: true
+    stdin_open: true
+    environment:
+      AMBARI_USER_NAME: "${AMBARI_USER_NAME}"
+      AMBARI_UID: "${AMBARI_UID}"
+    depends_on:
+      - "ambari-server"
+    volumes:
+      - ./ambari-agent/yarn-rm/mount/var/log/:/var/log/
+      - ./ambari-agent/yarn-rm/mount/hadoop/:/hadoop/
+    hostname: "yarn-rm"
+    privileged: true
+    networks:
+      cluster-network:
+        ipv4_address: 10.5.0.61
+        aliases:
+          - yarn.rm.local
 
 networks:
   cluster-network:
