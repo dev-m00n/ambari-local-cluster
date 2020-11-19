@@ -39,6 +39,7 @@ services:
       - "8441:8441"
     volumes:
       - ./ambari-server/mount/var/log/:/var/log/
+      - ./ambari-server/mount/etc/ambari-server/conf/ambari.properties:/etc/ambari-server/conf/ambari.properties
     hostname: "ambari-server"
     privileged: true
     networks:
