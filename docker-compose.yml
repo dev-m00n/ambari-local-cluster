@@ -39,7 +39,6 @@ services:
       - "8441:8441"
     volumes:
       - ./ambari-server/mount/var/log/:/var/log/
-      - ./ambari-server/mount/etc/ambari-server/conf/ambari.properties:/etc/ambari-server/conf/ambari.properties
     hostname: "ambari-server"
     privileged: true
     networks:
@@ -66,7 +65,20 @@ services:
       - "50090:50090"
     volumes:
       - ./ambari-agent/hadoop-name1/mount/var/log/:/var/log/
-      - ./ambari-agent/hadoop-name1/mount/hadoop/:/hadoop/
+      - ./ambari-agent/hadoop-name1/mount/hadoop/hdfs/data/:/hadoop/hdfs/data/ # hdfs data
+      - ./ambari-agent/hadoop-name1/mount/hadoop/hadoop/hdfs/data/:/hadoop/hadoop/hdfs/data/ # hdfs data
+      - ./ambari-agent/hadoop-name1/mount/hadoop/hdfs/namenode/:/hadoop/hdfs/namenode/ # namenode specific
+      - ./ambari-agent/hadoop-name1/mount/hadoop/hadoop/hdfs/namenode/:/hadoop/hadoop/hdfs/namenode/ # namenode specific
+      - ./ambari-agent/hadoop-name1/mount/tmp/upgrades/:/tmp/upgrades/ # namenode specific
+      - ./ambari-agent/hadoop-name1/mount/hadoop/hdfs/journalnode/:/hadoop/hdfs/journalnode/
+      - ./ambari-agent/hadoop-name1/mount/var/run/hadoop/:/var/run/hadoop/
+      - ./ambari-agent/hadoop-name1/mount/etc/hadoop/:/etc/hadoop/
+      - ./ambari-agent/hadoop-name1/mount/var/lib/hadoop-hdfs/dn_socket/:/var/lib/hadoop-hdfs/dn_socket/
+      - ./ambari-agent/hadoop-name1/mount/etc/security/serverKeys/:/etc/security/serverKeys/
+      - ./ambari-agent/hadoop-name1/mount/hdp/:/hdp/
+      - ./ambari-agent/hadoop-name1/mount/usr/hdp/:/usr/hdp/
+      - ./ambari-agent/hadoop-name1/mount/var/run/zookeeper/:/var/run/zookeeper/
+      - ./ambari-agent/hadoop-name1/mount/var/lib/smartsense/:/var/lib/smartsense/
     hostname: "hadoop-name1"
     privileged: true
     networks:
@@ -74,6 +86,7 @@ services:
         ipv4_address: 10.5.0.11
         aliases:
           - hadoop.name1.local
+
   datanode1:
     image: devmoonduck/ambari-local-agent:2.7.4.0
     container_name: "hadoop-data1"
@@ -86,7 +99,18 @@ services:
       - "ambari-server"
     volumes:
       - ./ambari-agent/hadoop-data1/mount/var/log/:/var/log/
-      - ./ambari-agent/hadoop-data1/mount/hadoop/:/hadoop/
+      - ./ambari-agent/hadoop-data1/mount/hadoop/hdfs/data/:/hadoop/hdfs/data/
+      - ./ambari-agent/hadoop-data1/mount/hadoop/hadoop/hdfs/data/:/hadoop/hadoop/hdfs/data/
+      - ./ambari-agent/hadoop-data1/mount/hadoop/hdfs/journalnode/:/hadoop/hdfs/journalnode/
+      - ./ambari-agent/hadoop-data1/mount/var/run/hadoop/:/var/run/hadoop/
+      - ./ambari-agent/hadoop-data1/mount/etc/hadoop/:/etc/hadoop/
+      - ./ambari-agent/hadoop-data1/mount/var/lib/hadoop-hdfs/dn_socket/:/var/lib/hadoop-hdfs/dn_socket/
+      - ./ambari-agent/hadoop-data1/mount/etc/security/serverKeys/:/etc/security/serverKeys/
+      - ./ambari-agent/hadoop-data1/mount/hdp/:/hdp/
+      - ./ambari-agent/hadoop-data1/mount/mr-history/:/mr-history/
+      - ./ambari-agent/hadoop-data1/mount/usr/hdp/:/usr/hdp/
+      - ./ambari-agent/hadoop-data1/mount/var/run/zookeeper/:/var/run/zookeeper/
+      - ./ambari-agent/hadoop-data1/mount/var/lib/smartsense/:/var/lib/smartsense/
     hostname: "hadoop-data1"
     privileged: true
     networks:
@@ -107,7 +131,19 @@ services:
       - "ambari-server"
     volumes:
       - ./ambari-agent/hadoop-data2/mount/var/log/:/var/log/
-      - ./ambari-agent/hadoop-data2/mount/hadoop/:/hadoop/
+      - ./ambari-agent/hadoop-data2/mount/hadoop/hdfs/data/:/hadoop/hdfs/data/
+      - ./ambari-agent/hadoop-data2/mount/hadoop/hadoop/hdfs/data/:/hadoop/hadoop/hdfs/data/
+      - ./ambari-agent/hadoop-data2/mount/hadoop/hdfs/journalnode/:/hadoop/hdfs/journalnode/
+      - ./ambari-agent/hadoop-data2/mount/var/run/hadoop/:/var/run/hadoop/
+      - ./ambari-agent/hadoop-data2/mount/etc/hadoop/:/etc/hadoop/
+      - ./ambari-agent/hadoop-data2/mount/var/lib/hadoop-hdfs/dn_socket/:/var/lib/hadoop-hdfs/dn_socket/
+      - ./ambari-agent/hadoop-data2/mount/etc/security/serverKeys/:/etc/security/serverKeys/
+      - ./ambari-agent/hadoop-data2/mount/hdp/:/hdp/
+      - ./ambari-agent/hadoop-data2/mount/mr-history/:/mr-history/
+      - ./ambari-agent/hadoop-data2/mount/hadoop/mapreduce/jhs/:/hadoop/mapreduce/jhs/
+      - ./ambari-agent/hadoop-data2/mount/usr/hdp/:/usr/hdp/
+      - ./ambari-agent/hadoop-data2/mount/var/run/zookeeper/:/var/run/zookeeper/  
+      - ./ambari-agent/hadoop-data2/mount/var/lib/smartsense/:/var/lib/smartsense/
     hostname: "hadoop-data2"
     privileged: true
     networks:
@@ -116,6 +152,7 @@ services:
         aliases:
           - hadoop.data2.local
 
+  # hive server / secondary namenode
   hive-server:
     image: devmoonduck/ambari-local-agent:2.7.4.0
     container_name: "hive-server"
@@ -132,7 +169,25 @@ services:
       - "10001:10001"
     volumes:
       - ./ambari-agent/hive-server/mount/var/log/:/var/log/
-      - ./ambari-agent/hive-server/mount/hadoop/:/hadoop/
+      - ./ambari-agent/hive-server/mount/hadoop/hdfs/data/:/hadoop/hdfs/data/
+      - ./ambari-agent/hive-server/mount/hadoop/hadoop/hdfs/data/:/hadoop/hadoop/hdfs/data/
+      - ./ambari-agent/hive-server/mount/hadoop/hdfs/namesecondary/:/hadoop/hdfs/namesecondary/
+      - ./ambari-agent/hive-server/mount/hadoop/hdfs/journalnode/:/hadoop/hdfs/journalnode/
+      - ./ambari-agent/hive-server/mount/var/run/hadoop/:/var/run/hadoop/
+      - ./ambari-agent/hive-server/mount/etc/hadoop/:/etc/hadoop/
+      - ./ambari-agent/hive-server/mount/var/lib/hadoop-hdfs/dn_socket/:/var/lib/hadoop-hdfs/dn_socket/
+      - ./ambari-agent/hive-server/mount/etc/security/serverKeys/:/etc/security/serverKeys/
+      - ./ambari-agent/hive-server/mount/hdp/:/hdp/
+      - ./ambari-agent/hive-server/mount/usr/hdp/:/usr/hdp/
+      - ./ambari-agent/hive-server/mount/var/run/hive/:/var/run/hive/
+      - ./ambari-agent/hive-server/mount/var/run/ambari-metrics-collector/:/var/run/ambari-metrics-collector/
+      - ./ambari-agent/hive-server/mount/var/run/ambari-metrics-monitor/:/var/run/ambari-metrics-monitor/
+      - ./ambari-agent/hive-server/mount/var/lib/ambari-metrics-collector/checkpoint/:/var/lib/ambari-metrics-collector/checkpoint/
+      - ./ambari-agent/hive-server/mount/var/lib/ambari-metrics-grafana/:/var/lib/ambari-metrics-grafana/
+      - ./ambari-agent/hive-server/mount/var/run/ambari-metrics-grafana/:/var/run/ambari-metrics-grafana/
+      - ./ambari-agent/hive-server/mount/etc/ambari-metrics-grafana/:/etc/ambari-metrics-grafana/
+      - ./ambari-agent/hive-server/mount/var/lib/smartsense/:/var/lib/smartsense/
+      - ./ambari-agent/hive-server/mount/tmp/hive/operation_logs/:/tmp/hive/operation_logs/
     hostname: "hive-server"
     privileged: true
     networks:
@@ -155,8 +210,19 @@ services:
       - "9092:9092"
     volumes:
       - ./ambari-agent/kafka-broker/mount/var/log/:/var/log/
-      - ./ambari-agent/kafka-broker/mount/hadoop/:/hadoop/
       - ./ambari-agent/kafka-broker/mount/kafka-logs/:/kafka-logs/
+      - ./ambari-agent/kafka-broker/mount/hadoop/hdfs/data/:/hadoop/hdfs/data/
+      - ./ambari-agent/kafka-broker/mount/hadoop/hadoop/hdfs/data/:/hadoop/hadoop/hdfs/data/
+      - ./ambari-agent/kafka-broker/mount/hadoop/hdfs/journalnode/:/hadoop/hdfs/journalnode/
+      - ./ambari-agent/kafka-broker/mount/var/run/hadoop/:/var/run/hadoop/
+      - ./ambari-agent/kafka-broker/mount/etc/hadoop/:/etc/hadoop/
+      - ./ambari-agent/kafka-broker/mount/var/lib/hadoop-hdfs/dn_socket/:/var/lib/hadoop-hdfs/dn_socket/
+      - ./ambari-agent/kafka-broker/mount/etc/security/serverKeys/:/etc/security/serverKeys/
+      - ./ambari-agent/kafka-broker/mount/hdp/:/hdp/
+      - ./ambari-agent/kafka-broker/mount/usr/hdp/:/usr/hdp/
+      - ./ambari-agent/kafka-broker/mount/hadoop/kafka-logs/:/hadoop/kafka-logs/
+      - ./ambari-agent/kafka-broker/mount/var/run/kafka/:/var/run/kafka/
+      - ./ambari-agent/kafka-broker/mount/var/lib/smartsense/:/var/lib/smartsense/
     hostname: "kafka-broker"
     privileged: true
     networks:
@@ -165,11 +231,14 @@ services:
         aliases:
           - kafka.broker1.local
 
+  # knox / nfs gateway
   knox:
     image: devmoonduck/ambari-local-agent:2.7.4.0
     container_name: "knox"
     tty: true
     stdin_open: true
+    cap_add:
+      - SYS_ADMIN
     environment:
       AMBARI_USER_NAME: "${AMBARI_USER_NAME}"
       AMBARI_UID: "${AMBARI_UID}"
@@ -177,7 +246,25 @@ services:
       - "ambari-server"
     volumes:
       - ./ambari-agent/knox/mount/var/log/:/var/log/
-      - ./ambari-agent/knox/mount/hadoop/:/hadoop/
+      - ./ambari-agent/knox/mount/hadoop/hdfs/data/:/hadoop/hdfs/data/
+      - ./ambari-agent/knox/mount/hadoop/hadoop/hdfs/data/:/hadoop/hadoop/hdfs/data/
+      - ./ambari-agent/knox/mount/tmp/.hdfs-nfs/:/tmp/.hdfs-nfs/
+      - ./ambari-agent/knox/mount/hadoop/hdfs/journalnode/:/hadoop/hdfs/journalnode/
+      - ./ambari-agent/knox/mount/var/run/hadoop/:/var/run/hadoop/
+      - ./ambari-agent/knox/mount/etc/hadoop/:/etc/hadoop/
+      - ./ambari-agent/knox/mount/var/lib/hadoop-hdfs/dn_socket/:/var/lib/hadoop-hdfs/dn_socket/
+      - ./ambari-agent/knox/mount/etc/security/serverKeys/:/etc/security/serverKeys/
+      - ./ambari-agent/knox/mount/hdp/:/hdp/
+      - ./ambari-agent/knox/mount/usr/hdp/:/usr/hdp/
+      - ./ambari-agent/knox/mount/var/run/ambari-metrics-collector/:/var/run/ambari-metrics-collector/
+      - ./ambari-agent/knox/mount/var/run/ambari-metrics-monitor/:/var/run/ambari-metrics-monitor/
+      - ./ambari-agent/knox/mount/var/lib/ambari-metrics-collector/checkpoint/:/var/lib/ambari-metrics-collector/checkpoint/
+      - ./ambari-agent/knox/mount/var/lib/ambari-metrics-grafana/:/var/lib/ambari-metrics-grafana/
+      - ./ambari-agent/knox/mount/var/run/ambari-metrics-grafana/:/var/run/ambari-metrics-grafana/
+      - ./ambari-agent/knox/mount/etc/ambari-metrics-grafana/:/etc/ambari-metrics-grafana/
+      - ./ambari-agent/knox/mount/etc/knox/:/etc/knox/
+      - ./ambari-agent/knox/mount/var/run/knox/:/var/run/knox/
+      - ./ambari-agent/knox/mount/var/lib/smartsense/:/var/lib/smartsense/
     hostname: "knox"
     privileged: true
     networks:
@@ -199,6 +286,32 @@ services:
     volumes:
       - ./ambari-agent/yarn-rm/mount/var/log/:/var/log/
       - ./ambari-agent/yarn-rm/mount/hadoop/:/hadoop/
+      - ./ambari-agent/yarn-rm/mount/hadoop/hdfs/data/:/hadoop/hdfs/data/
+      - ./ambari-agent/yarn-rm/mount/hadoop/hadoop/hdfs/data/:/hadoop/hadoop/hdfs/data/
+      - ./ambari-agent/yarn-rm/mount/hadoop/hdfs/journalnode/:/hadoop/hdfs/journalnode/
+      - ./ambari-agent/yarn-rm/mount/var/run/hadoop/:/var/run/hadoop/ 
+      - ./ambari-agent/yarn-rm/mount/etc/hadoop/:/etc/hadoop/
+      - ./ambari-agent/yarn-rm/mount/var/lib/hadoop-hdfs/dn_socket/:/var/lib/hadoop-hdfs/dn_socket/
+      - ./ambari-agent/yarn-rm/mount/etc/security/serverKeys/:/etc/security/serverKeys/
+      - ./ambari-agent/yarn-rm/mount/hadoop/yarn/local/:/hadoop/yarn/local/
+      - ./ambari-agent/yarn-rm/mount/hadoop/hadoop/yarn/local/:/hadoop/hadoop/yarn/local/
+      - ./ambari-agent/yarn-rm/mount/hadoop/yarn/log/:/hadoop/yarn/log/
+      - ./ambari-agent/yarn-rm/mount/hadoop/hadoop/yarn/log/:/hadoop/hadoop/yarn/log/
+      - ./ambari-agent/yarn-rm/mount/app-logs/:/app-logs/
+      - ./ambari-agent/yarn-rm/mount/hadoop/yarn/timeline/:/hadoop/yarn/timeline/
+      - ./ambari-agent/yarn-rm/mount/system/yarn/node-labels/:/system/yarn/node-labels/
+      - ./ambari-agent/yarn-rm/mount/hdp/:/hdp/
+      - ./ambari-agent/yarn-rm/mount/services/:/services/
+      - ./ambari-agent/yarn-rm/mount/ats/active/:/ats/active/
+      - ./ambari-agent/yarn-rm/mount/ats/done/:/ats/done/
+      - ./ambari-agent/yarn-rm/mount/usr/hdp/:/usr/hdp/
+      - ./ambari-agent/yarn-rm/mount/var/run/ambari-metrics-collector/:/var/run/ambari-metrics-collector/
+      - ./ambari-agent/yarn-rm/mount/var/run/ambari-metrics-monitor/:/var/run/ambari-metrics-monitor/
+      - ./ambari-agent/yarn-rm/mount/var/lib/ambari-metrics-collector/checkpoint:/var/lib/ambari-metrics-collector/checkpoint/
+      - ./ambari-agent/yarn-rm/mount/var/lib/ambari-metrics-grafana/:/var/lib/ambari-metrics-grafana/
+      - ./ambari-agent/yarn-rm/mount/var/run/ambari-metrics-grafana/:/var/run/ambari-metrics-grafana/
+      - ./ambari-agent/yarn-rm/mount/etc/ambari-metrics-grafana/:/etc/ambari-metrics-grafana/
+      - ./ambari-agent/yarn-rm/mount/var/lib/smartsense/:/var/lib/smartsense/
     hostname: "yarn-rm"
     privileged: true
     networks:
