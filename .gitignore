@@ -1,5 +1,5 @@
 *.log
 *.out
-ambari-server/mount/var/log/**/*
-ambari-agent/*/mount/var/log/**/*
-cluster-db/mount/**/*
+ambari-server/mount/*
+ambari-agent/**/mount/*
+cluster-db/mount/*
